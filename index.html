@@ -1,0 +1,699 @@
+<!doctype html>
+<!-- 제주 택시 조합원용 충전 혜택·내 동선 충전소 지도(카카오맵)·가입 가이드 (모바일 우선, 단일 파일) -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>제주 택시 충전 혜택</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  /* 현무암 · 유채 · 제주 바다 */
+  --basalt:#26292c; --basalt-2:#3a3e42; --lcd:#17191b;
+  --stone:#e8ebeb; --paper:#ffffff; --line:#d5dadb; --sub:#5f676c;
+  --canola:#f5c518; --canola-soft:#fdf3c4;
+  --sea:#0a6c87; --sea-soft:#e2f1f5;
+  --k200:#26292c; --k100:#0a6c87; --k50:#4fa3bb; --kslow:#9aa4a8;
+  --tbd:#a86a00;
+  --display:"Pretendard Variable",Pretendard,system-ui,sans-serif;
+  --text:"Pretendard Variable",Pretendard,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--stone);color:var(--basalt);font-family:var(--text);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+.tbd{border-bottom:1.5px dashed var(--tbd);color:var(--tbd)}
+.draft{font-size:12px;color:var(--tbd);background:#fff8de;text-align:center;padding:6px 16px}
+
+/* 머리: 택시 지붕 표시등 */
+.top{background:var(--basalt);color:#fff;padding:14px 0 18px}
+.lamp{display:inline-block;background:var(--canola);color:var(--basalt);font-weight:700;font-size:13px;padding:3px 12px 2px;border-radius:12px 12px 3px 3px}
+.top h1{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:24px;line-height:1.25;margin:10px 0 0}
+
+section.tab{display:none;padding:20px 0 28px}
+section.tab.on{display:block}
+.block{background:var(--paper);border-radius:6px;padding:18px 16px;margin-bottom:12px}
+h2{font-size:17px;font-weight:700;margin:0 0 12px;line-height:1.35}
+.note{font-size:13px;color:var(--sub);margin:8px 0 0}
+
+/* 혜택: 헤드라인 + 3개월 페이백 막대 */
+.lead{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:32px;line-height:1.25;margin:0 0 10px}
+.lead-sub{margin:0 0 18px;font-size:15px}
+.payback{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:end;margin:0;padding:0;list-style:none}
+.payback li{display:flex;flex-direction:column;gap:6px}
+.payback .bar{background:var(--canola);border-radius:4px 4px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:8px;font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:20px}
+.payback .m{font-size:13px;color:var(--sub);border-top:2px solid var(--basalt);padding-top:6px}
+.payback .w{font-weight:700;font-size:15px}
+.payback-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.payback-total b{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:24px}
+
+.price{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline}
+.price .was{font-size:15px;color:var(--sub);text-decoration:line-through}
+.price .now{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:40px;line-height:1}
+.price .now small{font-family:var(--text);font-size:14px;font-weight:500;margin-left:4px}
+.price .cut{grid-column:1/-1;font-size:14px}
+.price .cut b{background:var(--canola-soft);padding:1px 6px;border-radius:3px}
+
+/* 미터기 */
+.meter{background:var(--basalt);color:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.meter h2{color:#fff;margin-bottom:10px}
+.lcd{background:var(--lcd);border-radius:8px;padding:12px 14px 10px;border:1px solid #000;box-shadow:inset 0 2px 8px rgba(0,0,0,.6)}
+.lcd .k{font-size:12px;color:#9ba3a7}
+.lcd .v{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:46px;line-height:1.05;color:var(--canola);text-align:right;font-variant-numeric:tabular-nums;text-shadow:0 0 12px rgba(245,197,24,.35)}
+.lcd .v small{font-size:20px;margin-left:4px}
+.readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.readouts div{background:var(--basalt-2);border-radius:6px;padding:8px 10px}
+.readouts span{display:block;font-size:12px;color:#b9c0c3}
+.readouts b{font-size:17px}
+.meter label{display:block;font-size:14px;margin:16px 0 4px;color:#dfe3e5}
+.meter input[type=range]{width:100%;accent-color:var(--canola);height:28px}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:#9ba3a7}
+.meter .calc{margin-top:14px;border-top:1px solid var(--basalt-2);padding-top:10px}
+.meter .calc h3{margin:0;font-size:14px;font-weight:500;color:#dfe3e5}
+.scale{align-items:center}
+.avg{border:0;background:var(--canola);color:var(--basalt);font-weight:700;font-size:12px;border-radius:999px;padding:4px 10px;cursor:pointer}
+table.sim{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px;font-variant-numeric:tabular-nums}
+table.sim th,table.sim td{padding:6px 2px;text-align:right;border-bottom:1px solid var(--basalt-2);white-space:nowrap}
+table.sim th{font-weight:500;color:#9ba3a7}
+table.sim th:first-child,table.sim td:first-child{text-align:left}
+table.sim tr:last-child td{border-bottom:0;color:var(--canola);font-weight:700}
+
+ul.terms{margin:0;padding-left:18px;font-size:14px;color:var(--sub)}
+ul.terms li{margin:4px 0}
+.btn{display:block;width:100%;text-align:center;border:0;border-radius:10px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn.primary{background:var(--canola);color:var(--basalt)}
+.btn.quiet{background:transparent;color:var(--basalt);border:1.5px solid var(--basalt);margin-top:8px}
+
+/* 지도 탭 */
+.route .stop{display:grid;grid-template-columns:26px 1fr auto auto auto;gap:6px;align-items:center;margin-bottom:8px}
+.route .pin{width:26px;height:26px;border-radius:50%;background:var(--basalt);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.route .sbox{position:relative;min-width:0}
+.route input{width:100%;font-size:16px;padding:10px 10px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+.route input:focus{border-color:var(--basalt);outline:none}
+.mini{border:1.5px solid var(--line);background:#fff;border-radius:8px;font-size:12px;color:var(--sub);cursor:pointer;padding:9px 7px;white-space:nowrap}
+.sug{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);overflow:hidden}
+.sug:empty{display:none}
+.sug button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--stone);background:#fff;padding:10px 12px;cursor:pointer}
+.sug b{display:block;font-size:14px}
+.sug span{font-size:12px;color:var(--sub)}
+.sug .none{padding:10px 12px;font-size:13px;color:var(--sub)}
+.route .acts{display:grid;grid-template-columns:auto 1fr;gap:8px;margin-top:4px}
+.route .go{background:var(--basalt);color:#fff;border:0;border-radius:8px;font-weight:700;font-size:15px;padding:11px;cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;font-size:13px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--basalt);color:#fff;border-color:var(--basalt)}
+.chip.saved{border-color:var(--canola);background:var(--canola-soft)}
+.chips .cap{font-size:13px;color:var(--sub);margin-right:2px}
+.textbtns{display:flex;gap:14px;margin-top:10px}
+.textbtns button{border:0;background:none;padding:0;font-size:13px;color:var(--sea);text-decoration:underline;cursor:pointer}
+.hint{font-size:13px;color:var(--sub);margin-top:10px;min-height:1.2em}
+
+.mapwrap{position:relative;border-radius:10px;overflow:hidden;background:#a9d3e4}
+#map{height:58vh;min-height:340px;max-height:560px}
+.mapmsg{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;font-size:14px;background:rgba(232,235,235,.9)}
+.mapmsg:empty{display:none}
+
+/* 마커: 속도(kW) + 급속 면수 */
+.mk{position:relative;width:32px;height:32px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer;transition:transform .12s}
+.mk.k200{background:var(--k200);color:var(--canola)}
+.mk.k100{background:var(--k100)}
+.mk.k50{background:var(--k50)}
+.mk.slow{width:14px;height:14px;background:var(--kslow);font-size:0}
+.mk i{position:absolute;top:-7px;right:-9px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#fff;color:var(--basalt);border:1.5px solid var(--basalt);font-style:normal;font-family:var(--text);font-weight:700;font-size:11px;line-height:15px;text-align:center}
+.mk.dim{opacity:.28}
+.mk.sel{transform:scale(1.25);box-shadow:0 0 0 4px var(--canola),0 2px 6px rgba(0,0,0,.4)}
+.far .mk:not(.sel){width:16px;height:16px;font-size:0}
+.far .mk:not(.sel) i{display:none}
+.stopmk{background:var(--canola);color:var(--basalt);font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* 하단 시트: 충전소 상세 */
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:20;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:14px 14px 12px;transform:translateY(0);transition:transform .2s ease-out,opacity .2s}
+.sheet[hidden]{display:block;transform:translateY(calc(100% + 16px));opacity:0;pointer-events:none}
+.sheet .head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+.speed{width:64px;border-radius:8px;text-align:center;padding:7px 0 6px;color:#fff;line-height:1.1}
+.speed b{display:block;font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:24px}
+.speed span{font-size:11px}
+.speed.k200{background:var(--k200)}
+.speed.k200 b{color:var(--canola)}
+.speed.k100{background:var(--k100)}
+.speed.k50{background:var(--k50)}
+.speed.slow{background:var(--kslow)}
+.sheet .nm{font-size:17px;font-weight:700;line-height:1.3}
+.sheet .close{border:0;background:var(--stone);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 10px}
+.facts div{background:var(--stone);border-radius:8px;padding:8px 10px}
+.facts span{display:block;font-size:12px;color:var(--sub)}
+.facts b{font-size:15px}
+.plugs{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
+.plugs i{width:10px;height:16px;border-radius:2px 2px 4px 4px;background:var(--basalt)}
+.plugs i.s{background:var(--kslow);height:12px;margin-top:4px}
+.addr{font-size:13px;color:var(--sub);margin:0 0 10px}
+.navbtn{display:block;text-align:center;background:var(--canola);color:var(--basalt);font-weight:700;border-radius:8px;padding:12px;text-decoration:none}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--stone);color:var(--basalt-2)}
+.tag.hot{background:var(--canola-soft);color:#7a5a00}
+.tag.h24{background:var(--sea-soft);color:var(--sea)}
+.tag.lock{background:#fbe4e1;color:#a2281b}
+.tag.chk{background:#fff1d6;color:var(--tbd)}
+
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin:10px 0 0;align-items:center}
+.legend .mk{display:inline-grid;width:24px;height:24px;font-size:10px;vertical-align:middle;margin-right:4px;box-shadow:none;cursor:default}
+.legend .mk.slow{width:12px;height:12px}
+.filters{margin-top:14px}
+.count{font-size:14px;font-weight:700;margin:16px 0 8px}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:56px 1fr;gap:12px;background:#fff;border-radius:8px;padding:12px;cursor:pointer;border:1.5px solid transparent;text-align:left;width:100%}
+.row:hover{border-color:var(--line)}
+.row .speed{width:56px}
+.row .speed b{font-size:20px}
+.row .nm{font-weight:700;font-size:15px;line-height:1.3}
+.row .meta{font-size:13px;color:var(--sub);margin-top:2px}
+.row .meta b{color:var(--basalt);font-weight:500}
+.empty{background:#fff;border-radius:8px;padding:16px;font-size:14px}
+
+/* 가입 */
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--stone)}
+.steps li:first-child{border-top:0;padding-top:0}
+.steps li::before{counter-increment:s;content:counter(s);width:36px;height:36px;border-radius:50%;background:var(--basalt);color:var(--canola);font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:18px;display:grid;place-items:center}
+.steps h3{margin:4px 0 2px;font-size:16px}
+.steps p{margin:0;font-size:14px;color:var(--sub)}
+.code{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;background:var(--canola-soft);border:1.5px dashed #c9a20c;border-radius:8px;padding:10px 12px}
+.code b{font-family:var(--display);font-weight:800;letter-spacing:.06em;font-size:24px}
+.code button{border:0;background:var(--basalt);color:#fff;border-radius:6px;padding:8px 12px;cursor:pointer;font-size:13px}
+details.faq{border-top:1px solid var(--stone);padding:12px 0}
+details.faq:first-of-type{border-top:0;padding-top:0}
+details.faq summary{font-weight:700;cursor:pointer}
+details.faq p{margin:6px 0 0;font-size:14px;color:var(--sub)}
+.contact{text-align:center;font-size:13px;color:var(--sub)}
+
+/* 하단 탭 */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;max-width:186px;border:0;background:none;font-size:12px;color:var(--sub);padding:8px 0 9px;cursor:pointer;position:relative}
+nav.tabs svg{display:block;margin:0 auto 2px;width:22px;height:22px}
+nav.tabs button[aria-selected=true]{color:var(--basalt);font-weight:700}
+nav.tabs button[aria-selected=true]::before{content:"";position:absolute;top:-1px;left:30%;right:30%;height:3px;background:var(--canola);border-radius:0 0 3px 3px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="draft">내부 검토용 초안입니다. <span class="tbd">점선</span>은 확정이 필요한 항목입니다.</div>
+<header class="top"><div class="wrap">
+  <span class="lamp">SK일렉링크가 제안드립니다.</span>
+  <h1>제주 택시 충전 혜택</h1>
+</div></header>
+
+<main class="wrap">
+<!-- 혜택 -->
+<section class="tab on" id="t-benefit" aria-label="혜택">
+  <p class="lead">Master 구독료를<br>석 달 동안 두 번 돌려받으세요</p>
+  <p class="lead-sub">구독료 19,900원을 내면 3개월에 걸쳐 모두 39,800원을 <span class="tbd">충전 크레딧</span>으로 돌려드립니다.</p>
+
+  <div class="block">
+    <h2>달마다 돌려받는 금액</h2>
+    <ol class="payback">
+      <li><div class="bar" style="height:96px">100%</div><div class="m">1개월째</div><div class="w">19,900원</div></li>
+      <li><div class="bar" style="height:48px">50%</div><div class="m">2개월째</div><div class="w">9,950원</div></li>
+      <li><div class="bar" style="height:48px">50%</div><div class="m">3개월째</div><div class="w">9,950원</div></li>
+    </ol>
+    <div class="payback-total"><span>3개월 합계</span><b>39,800원</b></div>
+  </div>
+
+  <div class="block">
+    <h2>급속 충전 1kWh 가격</h2>
+    <div class="price">
+      <span class="was">391원</span><span class="now">295<small>원</small></span>
+      <span class="cut">kWh마다 <b>96원</b>씩 덜 냅니다. 충전량 한도는 없습니다.</span>
+    </div>
+    <p class="note">SK일렉링크 급속 충전기 회원가 기준, 2026년 9월 요금입니다.</p>
+  </div>
+
+  <div class="meter">
+    <h2>내가 아끼는 돈</h2>
+    <div class="lcd" aria-live="polite">
+      <div class="k">3개월 동안 아끼는 돈</div>
+      <div class="v"><span id="mTotal">239,300</span><small>원</small></div>
+    </div>
+    <div class="readouts">
+      <div><span>한 달 충전량</span><b id="mKwh">900kWh</b></div>
+      <div><span>4개월째부터 매달</span><b id="mAfter">66,500원</b></div>
+    </div>
+    <label for="kwh">한 달에 얼마나 충전하세요?</label>
+    <input id="kwh" type="range" min="100" max="2000" step="50" value="900">
+    <div class="scale"><span>100kWh</span><button class="avg" id="avg900" type="button">제주 택시 평균 900kWh</button><span>2,000kWh</span></div>
+    <div class="calc">
+      <h3>달마다 이렇게 계산됩니다</h3>
+      <table class="sim" id="sim"></table>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>받기 전에 확인하세요</h2>
+    <ul class="terms">
+      <li>조합원 인증을 마친 제주 사업용 택시 기사님이 대상입니다. <span class="tbd">인증 방식 확정 필요</span></li>
+      <li>매달 구독료가 결제되면 <span class="tbd">다음 달 ○일</span>에 돌려드립니다.</li>
+      <li>중간에 해지하면 그 뒤 달의 페이백은 드리지 않습니다.</li>
+      <li>이미 Master를 쓰고 계신 분의 적용 여부는 <span class="tbd">확정 필요</span>입니다.</li>
+    </ul>
+  </div>
+  <button class="btn primary" data-goto="t-join">가입 방법 보기</button>
+  <button class="btn quiet" data-goto="t-map">내 동선 충전소 찾기</button>
+</section>
+
+<!-- 지도 -->
+<section class="tab" id="t-map" aria-label="충전소 지도">
+  <div class="block route">
+    <h2>자주 다니는 길을 넣어 보세요</h2>
+    <div id="stops"></div>
+    <div class="acts">
+      <button class="mini" id="addStop">+ 경유지</button>
+      <button class="go" id="runRoute">이 길의 충전소 찾기</button>
+    </div>
+    <div class="chips" id="examples"></div>
+    <div class="chips" id="savedRoutes"></div>
+    <div class="textbtns"><button id="saveRoute">이 길 저장</button><button id="clearRoute">처음부터 다시</button></div>
+    <div class="hint" id="hint">출발지와 도착지를 검색해서 고르면, 그 길 주변 충전소를 지나는 순서대로 보여드립니다.</div>
+  </div>
+
+  <div class="mapwrap">
+    <div id="map" role="region" aria-label="제주 SK일렉링크 충전소 지도"></div>
+    <div class="mapmsg" id="mapmsg"></div>
+    <div class="sheet" id="sheet" hidden role="dialog" aria-label="충전소 정보"></div>
+  </div>
+  <div class="legend" aria-label="범례">
+    <span><span class="mk k200">200</span>초급속</span>
+    <span><span class="mk k100">100</span>급속</span>
+    <span><span class="mk k50">50</span>급속</span>
+    <span><span class="mk slow"></span>완속</span>
+    <span>마커 위 숫자는 급속 면수</span>
+  </div>
+
+  <div class="filters">
+    <div class="chips" role="group" aria-label="길에서 떨어진 거리">
+      <span class="cap">길에서</span>
+      <button class="chip" data-km="1" aria-pressed="false">1km</button>
+      <button class="chip" data-km="2" aria-pressed="true">2km</button>
+      <button class="chip" data-km="3" aria-pressed="false">3km</button>
+      <button class="chip" data-km="5" aria-pressed="false">5km</button>
+    </div>
+    <div class="chips" role="group" aria-label="충전소 조건">
+      <button class="chip" id="fFast" aria-pressed="true">급속만</button>
+      <button class="chip" id="f24" aria-pressed="false">24시간만</button>
+      <button class="chip" id="fPriv" aria-pressed="false">전용 충전소 포함</button>
+    </div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="list" id="list"></div>
+</section>
+
+<!-- 가입 -->
+<section class="tab" id="t-join" aria-label="가입하기">
+  <p class="lead">가입은 세 단계면 끝납니다</p>
+  <div class="block">
+    <ol class="steps">
+      <li><div><h3>SK일렉링크 앱 설치</h3><p>휴대폰 본인인증으로 가입합니다. 이미 회원이면 로그인만 하세요.</p></div></li>
+      <li><div><h3>구독에서 Master 선택</h3><p>결제 카드를 등록하면 바로 295원 요금이 적용됩니다.</p></div></li>
+      <li><div><h3>조합 코드 입력</h3><p>아래 코드를 넣으면 페이백 대상으로 등록됩니다.</p>
+        <div class="code"><b class="tbd" id="codeText">JEJUTAXI</b><button id="copyCode">코드 복사</button></div></div></li>
+    </ol>
+  </div>
+  <a class="btn primary" href="#" id="appLink">SK일렉링크 앱 설치 <span class="tbd" style="font-weight:500;font-size:12px">링크 확정 필요</span></a>
+
+  <div class="block" style="margin-top:12px">
+    <h2>자주 묻는 질문</h2>
+    <details class="faq"><summary>페이백은 언제, 어떻게 받나요?</summary>
+      <p>매달 구독료가 결제되면 다음 달에 <span class="tbd">충전 크레딧</span>으로 들어옵니다. 1개월째 19,900원, 2개월째와 3개월째에 9,950원씩, 모두 39,800원입니다.</p></details>
+    <details class="faq"><summary>충전을 많이 해도 같은 요금인가요?</summary>
+      <p>네. Master는 충전량 한도가 없어서 많이 충전할수록 더 많이 아낍니다.</p></details>
+    <details class="faq"><summary>다른 회사 충전기에서도 295원인가요?</summary>
+      <p>아닙니다. 295원은 SK일렉링크 충전기에서만 적용됩니다. ‘충전소 지도’에서 다니는 길 위의 충전기를 찾아보세요.</p></details>
+    <details class="faq"><summary>해지는 어떻게 하나요?</summary>
+      <p>앱의 구독 메뉴에서 언제든 해지할 수 있습니다. 해지한 뒤 달의 페이백은 드리지 않습니다.</p></details>
+  </div>
+  <p class="contact">문의 <span class="tbd">고객센터 번호, 조합 담당자</span></p>
+</section>
+</main>
+
+<nav class="tabs" role="tablist" aria-label="화면 전환">
+  <button role="tab" aria-selected="true" data-tab="t-benefit">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7.5 9l2 6 2.5-5 2.5 5 2-6M6.5 12h11"/></svg>혜택</button>
+  <button role="tab" aria-selected="false" data-tab="t-map">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0113 0c0 5-6.5 11-6.5 11z"/><path d="M12.8 7l-2.3 3.5h3l-2.3 3.5"/></svg>충전소 지도</button>
+  <button role="tab" aria-selected="false" data-tab="t-join">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9.5 12l2 2 3.5-4"/></svg>가입하기</button>
+</nav>
+
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=825a7e9f4444cd7f3ad90a4689fffd8f&autoload=false&libraries=services"></script>
+<script>
+(function () {
+  "use strict";
+  var STATIONS = [{"id": "60000040", "nm": "맥도날드 외도DT점", "addr": "제주특별자치도 제주시 일주서로 7339", "type": "맥도날드", "kw": 200, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.49339, "lng": 126.431174, "access": "open", "hot": true}, {"id": "60030012", "nm": "맥도날드 제주공항DT점", "addr": "제주특별자치도 제주시 도령로 159", "type": "맥도날드", "kw": 200, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.495194, "lng": 126.492853, "access": "open", "hot": true}, {"id": "60070013", "nm": "제주 제스코마트 제주점", "addr": "제주특별자치도 제주시 연북로 444", "type": "마트/시장/몰", "kw": 200, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.480732, "lng": 126.528859, "access": "open", "hot": true}, {"id": "50110047", "nm": "대림교통", "addr": "제주특별자치도 제주시 선반로10길 21", "type": "택시사", "kw": 200, "fast": 6, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.513571, "lng": 126.56729, "access": "open", "hot": true}, {"id": "60040016", "nm": "동쪽송당 동화마을", "addr": "제주특별자치도 제주시 구좌읍 비자림로 1191", "type": "관광지", "kw": 200, "fast": 16, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.435433, "lng": 126.732038, "access": "open", "hot": true}, {"id": "50130026", "nm": "삼성스토어 서귀포", "addr": "제주특별자치도 서귀포시 일주서로 17 (강정동)", "type": "삼성전자판매", "kw": 100, "fast": 2, "slow": 0, "hours": "10:00~20:30 ", "h24": false, "freePk": false, "lat": 33.249283, "lng": 126.505552, "access": "open", "hot": false}, {"id": "50110054", "nm": "KD렌트카(운수사 전용)", "addr": "제주특별자치도 제주시 일주서로 7667", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.494817, "lng": 126.465474, "access": "private", "hot": false}, {"id": "50110052", "nm": "제주공항전기차", "addr": "제주특별자치도 제주시 다호5길 17", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.501872, "lng": 126.48952, "access": "open", "hot": false}, {"id": "50110040", "nm": "제주렌트카", "addr": "제주특별자치도 제주시 서해안로 442-53", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59", "h24": true, "freePk": false, "lat": 33.515635, "lng": 126.4909, "access": "check", "hot": false}, {"id": "50110048", "nm": "남양교통", "addr": "제주특별자치도 제주시 백포남길 11-1", "type": "택시사", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.495712, "lng": 126.462096, "access": "open", "hot": false}, {"id": "60130031", "nm": "늘푸른주유소", "addr": "제주 제주시 서광로 137", "type": "SK", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.500624, "lng": 126.511283, "access": "open", "hot": false}, {"id": "50110051", "nm": "제주공항렌트카(운수사전용)", "addr": "제주특별자치도 제주시 다호5길 17", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.501872, "lng": 126.48952, "access": "private", "hot": false}, {"id": "60110007", "nm": "제주국제공항 여객 P1주차장", "addr": "제주특별자치도 제주시 공항로 2", "type": "관광지", "kw": 100, "fast": 2, "slow": 28, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.506051, "lng": 126.493984, "access": "open", "hot": false}, {"id": "50110043", "nm": "한라렌트카(운수사 전용)", "addr": "제주특별자치도 제주시 다호길 126", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.502698, "lng": 126.493908, "access": "private", "hot": false}, {"id": "50110041", "nm": "제주타요렌트카(입주사 전용)", "addr": "제주특별자치도 제주시 일주서로 7662", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.493931, "lng": 126.464861, "access": "private", "hot": false}, {"id": "50110059", "nm": "삼성스토어 제주", "addr": "제주특별자치도 제주시 연삼로 9 (연동)", "type": "삼성전자판매", "kw": 100, "fast": 4, "slow": 0, "hours": "10:00~20:30 ", "h24": false, "freePk": false, "lat": 33.493963, "lng": 126.493562, "access": "open", "hot": true}, {"id": "50110058", "nm": "삼성스토어 제주인화", "addr": "제주특별자치도 제주시 연삼로 633 (건입동)", "type": "삼성전자판매", "kw": 100, "fast": 2, "slow": 0, "hours": "10:00~20:30 ", "h24": false, "freePk": false, "lat": 33.507278, "lng": 126.555581, "access": "open", "hot": true}, {"id": "60000048", "nm": "한라교통", "addr": "제주특별자치도 서귀포시 토평공단로107번길 22", "type": "택시사", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.290678, "lng": 126.582322, "access": "open", "hot": false}, {"id": "60060011", "nm": "농협은행 제주본점", "addr": "제주특별자치도 제주시 서사로 52", "type": "은행", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.507849, "lng": 126.519357, "access": "open", "hot": true}, {"id": "50110049", "nm": "매일렌트카", "addr": "제주특별자치도 제주시 어영길 64-12", "type": "렌트카", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.51749, "lng": 126.498454, "access": "check", "hot": false}, {"id": "50110053", "nm": "제주동백렌트카(운수사전용)", "addr": "제주특별자치도 제주시 다호5길 17", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.501872, "lng": 126.48952, "access": "private", "hot": false}, {"id": "50110044", "nm": "제주에코렌트카(입주사 전용)", "addr": "제주특별자치도 제주시 도두일동 1173-1", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.498141, "lng": 126.479938, "access": "private", "hot": false}, {"id": "5011EM02", "nm": "이마트 신제주점 (지상5층주차장)", "addr": "제주특별자치도 제주시 1100로 3348", "type": "이마트", "kw": 100, "fast": 10, "slow": 0, "hours": "09:00~23:00", "h24": false, "freePk": true, "lat": 33.484965, "lng": 126.480432, "access": "open", "hot": false}, {"id": "60100093", "nm": "기아오토큐 서제주서비스", "addr": "제주 제주시 오광로 193(노형동)", "type": "기아자동차", "kw": 100, "fast": 1, "slow": 0, "hours": "00:00~16:00 ", "h24": false, "freePk": false, "lat": 33.480411, "lng": 126.465321, "access": "open", "hot": false}, {"id": "60060010", "nm": "조천농협", "addr": "제주특별자치도 제주시 조천읍 조천우회로 325", "type": "은행", "kw": 100, "fast": 4, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.528085, "lng": 126.644286, "access": "open", "hot": false}, {"id": "5013EM01", "nm": "이마트 서귀포점(지상2층주차장)", "addr": "제주특별자치도 서귀포시 일주동로 9209", "type": "이마트", "kw": 100, "fast": 13, "slow": 0, "hours": "10:00~22:00 ", "h24": false, "freePk": true, "lat": 33.24832, "lng": 126.508988, "access": "open", "hot": false}, {"id": "50110042", "nm": "화신교통(운수사 전용)", "addr": "제주특별자치도 제주시 오일장서길 60", "type": "택시사", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.497072, "lng": 126.472605, "access": "private", "hot": true}, {"id": "50130022", "nm": "남원운수(운수사 전용)", "addr": "제주특별자치도 서귀포시 남원읍 하례돈야로128번길 107", "type": "택시사", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.291901, "lng": 126.612665, "access": "private", "hot": false}, {"id": "50130021", "nm": "서귀포택시", "addr": "제주특별자치도 서귀포시 토평공단로127번길 25", "type": "택시사", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.291376, "lng": 126.580693, "access": "open", "hot": false}, {"id": "60070007", "nm": "SK핀크스(본태박물관)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "체육문화시설", "kw": 100, "fast": 2, "slow": 2, "hours": "00:00~23:59", "h24": true, "freePk": false, "lat": 33.303274, "lng": 126.391541, "access": "check", "hot": false}, {"id": "60110017", "nm": "제주 제스코마트 서귀포점", "addr": "제주특별자치도 서귀포시 상효로 39", "type": "마트/시장/몰", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.263333, "lng": 126.596587, "access": "open", "hot": false}, {"id": "60000047", "nm": "하이제주", "addr": "제주특별자치도 제주시 선반남2길 29", "type": "렌트카", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.512625, "lng": 126.562644, "access": "check", "hot": false}, {"id": "60030057", "nm": "현대자동차블루핸즈 제주공항현대서비스", "addr": "제주특별자치도 제주시 서광로 77", "type": "현대자동차", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59", "h24": true, "freePk": false, "lat": 33.500297, "lng": 126.504763, "access": "open", "hot": false}, {"id": "50110031", "nm": "제주아리랑렌트카(입주사 전용)", "addr": "제주특별자치도 제주시 용마서길 34", "type": "렌트카", "kw": 100, "fast": 4, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.514957, "lng": 126.502067, "access": "private", "hot": false}, {"id": "50110050", "nm": "동방운수", "addr": "제주특별자치도 제주시 선반로2길 5-3", "type": "택시사", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.514261, "lng": 126.560203, "access": "open", "hot": false}, {"id": "50130023", "nm": "기아 서귀포지점", "addr": "제주특별자치도 서귀포시 516로 58", "type": "기아자동차", "kw": 100, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.259379, "lng": 126.580686, "access": "open", "hot": true}, {"id": "60110008", "nm": "제주국제공항 직원 A주차장", "addr": "제주특별자치도 제주시 공항로 2", "type": "관광지", "kw": 100, "fast": 2, "slow": 3, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.505714, "lng": 126.496416, "access": "private", "hot": false}, {"id": "5011EM01", "nm": "이마트 제주점(야외1층주차장)", "addr": "제주특별자치도 제주시 탑동로 38", "type": "이마트", "kw": 100, "fast": 12, "slow": 0, "hours": "09:00~23:00", "h24": false, "freePk": true, "lat": 33.517975, "lng": 126.521177, "access": "open", "hot": true}, {"id": "50130020", "nm": "제주글램핑(스타빌)", "addr": "제주특별자치도 서귀포시 안덕면 광평리 산32", "type": "숙박", "kw": 50, "fast": 1, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.33682, "lng": 126.3952, "access": "check", "hot": false}, {"id": "50110027", "nm": "제주킹스토아", "addr": "제주특별자치도 제주시 동문로 82", "type": "마트/시장/몰", "kw": 50, "fast": 1, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.5135, "lng": 126.535551, "access": "open", "hot": false}, {"id": "50110056", "nm": "제주국제공항 직원 D주차장", "addr": "제주특별자치도 제주시 도두이동 404-1", "type": "관광지", "kw": 50, "fast": 1, "slow": 9, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.504024, "lng": 126.488853, "access": "private", "hot": false}, {"id": "50110034", "nm": "현대자동차 제주하귀대리점", "addr": "제주특별자치도 제주시 애월읍 일주서로 7179", "type": "현대자동차", "kw": 50, "fast": 1, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.487397, "lng": 126.415359, "access": "open", "hot": false}, {"id": "50110033", "nm": "기아 한라대리점", "addr": "제주특별자치도 제주시 연삼로 177", "type": "기아자동차", "kw": 50, "fast": 1, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.493056, "lng": 126.51159, "access": "open", "hot": false}, {"id": "60220020", "nm": "삼화2차 부영아파트(입주민 전용)", "addr": "제주특별자치도 제주시 화삼로 12", "type": "아파트", "kw": 50, "fast": 1, "slow": 9, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.513877, "lng": 126.573835, "access": "private", "hot": false}, {"id": "50110026", "nm": "BGF 제주한북로점(CU)", "addr": "제주특별자치도 제주시 한북로 165", "type": "CU", "kw": 50, "fast": 1, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.462966, "lng": 126.533709, "access": "open", "hot": false}, {"id": "50110032", "nm": "기아 동제주지점", "addr": "제주특별자치도 제주시 동문로 153", "type": "기아자동차", "kw": 50, "fast": 1, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.513406, "lng": 126.542939, "access": "open", "hot": true}, {"id": "50110045", "nm": "남해어업관리단", "addr": "제주특별자치도 제주시 임항로 142-6", "type": "일반(오피스)", "kw": 50, "fast": 2, "slow": 0, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.519404, "lng": 126.538881, "access": "open", "hot": false}, {"id": "60050053", "nm": "해안유진빌", "addr": "제주특별자치도 제주시 해안마을2길 7-8", "type": "월드비전", "kw": 30, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.461586, "lng": 126.451503, "access": "open", "hot": false}, {"id": "50110025", "nm": "휴스토리3차", "addr": "제주특별자치도 제주시 우평로 198", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.481981, "lng": 126.445577, "access": "private", "hot": false}, {"id": "50130017", "nm": "해비치CC", "addr": "제주특별자치도 서귀포시 남원읍 원님로399번길 319", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 5, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.35995, "lng": 126.728173, "access": "check", "hot": false}, {"id": "50110066", "nm": "제주은행 한림지점", "addr": "제주특별자치도 제주시 한림읍 한림로 667 ", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.414762, "lng": 126.264358, "access": "open", "hot": false}, {"id": "60070008", "nm": "SK핀크스(후생관 주차장)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 3, "hours": "00:00~23:59 ", "h24": false, "freePk": true, "lat": 33.30536, "lng": 126.393685, "access": "check", "hot": false}, {"id": "50000005", "nm": "바로가스상사", "addr": "제주특별자치도 제주시 한북로 286", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.456811, "lng": 126.54386, "access": "open", "hot": false}, {"id": "50000001", "nm": "코즈게스트하우스", "addr": "제주특별자치도 서귀포시 안덕면 동광로100번길 20", "type": "숙박", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.304282, "lng": 126.338667, "access": "check", "hot": false}, {"id": "50110057", "nm": "제주국제공항 여객 P2장기주차장", "addr": "제주특별자치도 제주시 도두이동 398-2", "type": "관광지", "kw": 7, "fast": 0, "slow": 24, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.503215, "lng": 126.489447, "access": "open", "hot": false}, {"id": "50110035", "nm": "제주평화렌트카", "addr": "제주특별자치도 제주시 용해로 119", "type": "렌트카", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.507038, "lng": 126.505484, "access": "check", "hot": false}, {"id": "50130028", "nm": "제주은행 모슬포지점", "addr": "제주특별자치도 서귀포시 대정읍 신영로 75 ", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.220986, "lng": 126.250822, "access": "open", "hot": false}, {"id": "60070002", "nm": "SK핀크스(비오토피아)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 5, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.30536, "lng": 126.393685, "access": "check", "hot": false}, {"id": "60010068", "nm": "기아 제주지역본부(임직원 전용)", "addr": "제주특별자치도 제주시 동광로 117", "type": "기아자동차", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.506889, "lng": 126.539301, "access": "private", "hot": false}, {"id": "50130025", "nm": "남제주농협", "addr": "제주특별자치도 서귀포시 중정로 86 (서귀동)", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.248162, "lng": 126.565456, "access": "open", "hot": false}, {"id": "50110019", "nm": "재현가게", "addr": "제주특별자치도 제주시 광양7길 32-9", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.501203, "lng": 126.532802, "access": "open", "hot": false}, {"id": "50130004", "nm": "메밀밭에가시리", "addr": "제주특별자치도 서귀포시 표선면 가시로 423", "type": "일반(상업)", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.346586, "lng": 126.782961, "access": "open", "hot": false}, {"id": "50000006", "nm": "오션퍼스트 민박", "addr": "제주특별자치도 제주시 애월읍 부룡수길 10", "type": "숙박", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.474993, "lng": 126.354219, "access": "check", "hot": false}, {"id": "50110061", "nm": "제주은행 본점", "addr": "제주특별자치도 제주시 노형11길 6", "type": "은행", "kw": 7, "fast": 0, "slow": 3, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.484556, "lng": 126.477951, "access": "open", "hot": false}, {"id": "60060094", "nm": "SK핀크스(포도호텔)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "숙박", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.30536, "lng": 126.393685, "access": "check", "hot": false}, {"id": "50110055", "nm": "노형휴스토리", "addr": "제주특별자치도 제주시 우평로 41", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.479103, "lng": 126.461712, "access": "open", "hot": false}, {"id": "60110014", "nm": "제주국제공항 행사주차장", "addr": "제주특별자치도 제주시 공항로 2", "type": "관광지", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.506954, "lng": 126.494886, "access": "open", "hot": false}, {"id": "50110028", "nm": "영도갤럭시타운(입주민 전용)", "addr": "제주특별자치도 제주시 도련3길 17", "type": "아파트", "kw": 7, "fast": 0, "slow": 5, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.508305, "lng": 126.5863, "access": "private", "hot": false}, {"id": "50000002", "nm": "대한예수교장로회법환교회", "addr": "제주특별자치도 서귀포시 일주서로43번길 38", "type": "일반(상업)", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.247511, "lng": 126.505629, "access": "open", "hot": false}, {"id": "50110060", "nm": "제주은행 노형뉴타운지점", "addr": "제주특별자치도 제주시 수덕로 49 (노형동)", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.485632, "lng": 126.472159, "access": "open", "hot": false}, {"id": "50130027", "nm": "제주은행 동홍동지점", "addr": "제주특별자치도 서귀포시 일주동로 8560 (동홍동)", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.255061, "lng": 126.573586, "access": "open", "hot": false}, {"id": "50130030", "nm": "제주은행 중문지점", "addr": "제주특별자치도 서귀포시 천제연로 244 (중문동)", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.25101, "lng": 126.43076, "access": "open", "hot": false}, {"id": "50110008", "nm": "베니스타워", "addr": "제주특별자치도 제주시 서해안로 346-9", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.509596, "lng": 126.481999, "access": "open", "hot": false}, {"id": "50000004", "nm": "대원상록수10차아파트(입주민 전용)", "addr": "제주특별자치도 제주시 우령2길 2", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.48901, "lng": 126.431442, "access": "private", "hot": false}, {"id": "50110022", "nm": "골든뷰(입주민 전용)", "addr": "제주특별자치도 제주시 애월읍 신엄안3길 102", "type": "아파트", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.472547, "lng": 126.35726, "access": "private", "hot": false}, {"id": "50110030", "nm": "제주 라메르타운", "addr": "제주특별자치도 제주시 도련남길 59-1", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 4, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.506428, "lng": 126.585725, "access": "open", "hot": false}, {"id": "60060091", "nm": "SK핀크스(직원주차장)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.30536, "lng": 126.393685, "access": "private", "hot": false}, {"id": "60060092", "nm": "SK핀크스(비토센터)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.30536, "lng": 126.393685, "access": "check", "hot": false}, {"id": "50000003", "nm": "조천리 새마을회", "addr": "제주특별자치도 제주시 조천읍 신북로 246-1", "type": "행정", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.536841, "lng": 126.638808, "access": "open", "hot": false}, {"id": "50130008", "nm": "중문천마에코피아", "addr": "제주특별자치도 서귀포시 대포중앙로 21", "type": "아파트", "kw": 7, "fast": 0, "slow": 4, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.249253, "lng": 126.433279, "access": "private", "hot": false}, {"id": "50110020", "nm": "그린나래(입주민 전용)", "addr": "제주특별자치도 제주시 구산서길 29", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.478965, "lng": 126.533873, "access": "private", "hot": false}, {"id": "60130039", "nm": "루체빌포도뮤지엄", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 786", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 4, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.319664, "lng": 126.384853, "access": "check", "hot": false}, {"id": "50110063", "nm": "제주은행 연북로지점", "addr": "제주특별자치도 제주시 연북로 54 (노형동)", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.481624, "lng": 126.487088, "access": "open", "hot": false}, {"id": "60060093", "nm": "SK핀크스(골프장)", "addr": "제주특별자치도 서귀포시 안덕면 산록남로 863", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59", "h24": true, "freePk": false, "lat": 33.315871, "lng": 126.389228, "access": "check", "hot": false}, {"id": "50110065", "nm": "제주은행 외도지점", "addr": "제주특별자치도 제주시 우정로 50 (외도일동, 더펠리스2차)", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.488522, "lng": 126.430659, "access": "open", "hot": false}, {"id": "50130018", "nm": "서귀포팬텀골프장", "addr": "제주특별자치도 서귀포시 산록남로 2914", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.310441, "lng": 126.588919, "access": "check", "hot": false}, {"id": "50130019", "nm": "서귀포팬텀리조트", "addr": "제주특별자치도 서귀포시 산록남로 2917", "type": "숙박", "kw": 7, "fast": 0, "slow": 6, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.311771, "lng": 126.587303, "access": "check", "hot": false}, {"id": "50110023", "nm": "이타스3차자치회(입주민 전용)", "addr": "제주특별자치도 제주시 과원북4길 17", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.481343, "lng": 126.483998, "access": "private", "hot": false}, {"id": "50130029", "nm": "제주은행 성산지점", "addr": "제주특별자치도 서귀포시 성산읍 고성오조로 62 ", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.449349, "lng": 126.915253, "access": "open", "hot": false}, {"id": "50130031", "nm": "제주은행 표선지점", "addr": "제주특별자치도 서귀포시 표선면 표선동서로 259 ", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.326842, "lng": 126.833295, "access": "open", "hot": false}, {"id": "50110046", "nm": "기아오토큐 서제주서비스", "addr": "제주특별자치도 제주시 오광로 193", "type": "기아자동차", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.480373, "lng": 126.465385, "access": "open", "hot": false}, {"id": "50130024", "nm": "산방산코아루 아이비타운 관리위원회(입주민전용)", "addr": "제주특별자치도 서귀포시 안덕면 사계북로 137", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.237768, "lng": 126.301964, "access": "private", "hot": false}, {"id": "60010015", "nm": "기아 신제주지점(임직원 전용)", "addr": "제주특별자치도 제주시 도령로 196", "type": "기아자동차", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.496854, "lng": 126.495545, "access": "private", "hot": false}, {"id": "60110013", "nm": "제주국제공항 화물청사", "addr": "제주특별자치도 제주시 공항로 2", "type": "노외주차장", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.505378, "lng": 126.499748, "access": "open", "hot": false}, {"id": "50130007", "nm": "바다야주식회사", "addr": "제주특별자치도 서귀포시 표선면 번영로 2524", "type": "일반(오피스)", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.405999, "lng": 126.77663, "access": "open", "hot": false}, {"id": "50110021", "nm": "비치펠리스(입주민 전용)", "addr": "제주특별자치도 제주시 구좌읍 면수길 34", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.523677, "lng": 126.866477, "access": "private", "hot": false}, {"id": "50110014", "nm": "외도 해밀마루 아파트(입주민 전용)", "addr": "제주특별자치도 제주시 우정로15길 48", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.488875, "lng": 126.432824, "access": "private", "hot": false}, {"id": "50110012", "nm": "허니루체하임(입주민 전용)", "addr": "제주특별자치도 제주시 가령로1길 11", "type": "아파트", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.504286, "lng": 126.538104, "access": "private", "hot": false}, {"id": "50110062", "nm": "제주은행 연동지점", "addr": "제주특별자치도 제주시 신광로 49 (연동)", "type": "은행", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.48763, "lng": 126.490284, "access": "open", "hot": false}, {"id": "60110015", "nm": "제주국제공항 직원 F주차장", "addr": "제주특별자치도 제주시 공항로 2", "type": "관광지", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.504667, "lng": 126.495598, "access": "private", "hot": false}, {"id": "50110007", "nm": "(주)미라클", "addr": "제주특별자치도 제주시 서해안로 346-14", "type": "숙박", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.509375, "lng": 126.481373, "access": "check", "hot": false}, {"id": "50110009", "nm": "이도 주원라비앙(입주민 전용)", "addr": "제주특별자치도 제주시 가령로 58", "type": "아파트", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.499024, "lng": 126.536267, "access": "private", "hot": false}, {"id": "50110024", "nm": "새김녕의원", "addr": "제주특별자치도 제주시 구좌읍 김녕로 116", "type": "병원", "kw": 7, "fast": 0, "slow": 1, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.554821, "lng": 126.750451, "access": "open", "hot": false}, {"id": "50110010", "nm": "(주)유티에스골프빌리지", "addr": "제주특별자치도 제주시 애월읍 광령평화2길 170-2", "type": "체육문화시설", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.430639, "lng": 126.434578, "access": "check", "hot": false}, {"id": "50130015", "nm": "주식회사일레인", "addr": "제주특별자치도 서귀포시 일주서로 660", "type": "숙박", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.254508, "lng": 126.439088, "access": "check", "hot": false}, {"id": "50000008", "nm": "휴스토리 애월(입주민전용)", "addr": "제주특별자치도 제주시 애월읍 하소로 180", "type": "아파트", "kw": 7, "fast": 0, "slow": 2, "hours": "00:00~23:59 ", "h24": false, "freePk": false, "lat": 33.465754, "lng": 126.392125, "access": "private", "hot": false}];
+  var LIST_P = 391, MASTER_P = 295, FEE = 19900, PAYBACK = [1, 0.5, 0.5];
+  var MAX_LEVEL = 10;                                   // 8km 축척 = 제주도 전체. 이보다 축소 불가
+  var JEJU = { s: 33.22, n: 33.52, w: 126.22, e: 126.90 }; // 지도 중심이 머물 수 있는 범위
+  var JEJU_RECT = "126.14,33.10,126.98,33.60";           // 장소 검색 범위
+  var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // 예시 동선용 제주 주요 지점 (대략 좌표)
+  var PLACES = [
+    ["제주국제공항", 33.5070, 126.4930], ["제주시청", 33.4996, 126.5312], ["노형오거리", 33.4847, 126.4810],
+    ["동문시장", 33.5122, 126.5281], ["제주항 연안여객터미널", 33.5205, 126.5432], ["제주대학교", 33.4560, 126.5620],
+    ["하귀", 33.4800, 126.4100], ["애월항", 33.4620, 126.3100], ["한림항", 33.4140, 126.2660], ["협재해수욕장", 33.3940, 126.2390],
+    ["모슬포항", 33.2180, 126.2510], ["산방산", 33.2380, 126.3130], ["중문관광단지", 33.2500, 126.4120],
+    ["서귀포시청", 33.2541, 126.5600], ["서귀포 매일올레시장", 33.2500, 126.5630], ["남원", 33.2790, 126.7190],
+    ["표선해수욕장", 33.3260, 126.8370], ["성산일출봉", 33.4590, 126.9410], ["김녕", 33.5570, 126.7590],
+    ["함덕해수욕장", 33.5432, 126.6695], ["조천", 33.5380, 126.6340]
+  ];
+  var EXAMPLES = [["공항에서 중문", [0, 12]], ["공항에서 성산", [0, 17]], ["제주시청에서 서귀포시청", [1, 13]]];
+
+  function $(id) { return document.getElementById(id); }
+  function won(n) { return Math.round(n).toLocaleString("ko-KR") + "원"; }
+  function num(n) { return Math.round(n).toLocaleString("ko-KR"); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+
+  /* ---------- 탭 ---------- */
+  var map = null;
+  function showTab(id) {
+    document.querySelectorAll("section.tab").forEach(function (s) { s.classList.toggle("on", s.id === id); });
+    document.querySelectorAll("nav.tabs button").forEach(function (b) { b.setAttribute("aria-selected", b.dataset.tab === id ? "true" : "false"); });
+    window.scrollTo(0, 0);
+    if (id === "t-map") { if (!map) initMap(); else map.relayout(); }
+  }
+  document.querySelectorAll("[data-tab]").forEach(function (b) { b.addEventListener("click", function () { showTab(b.dataset.tab); }); });
+  document.querySelectorAll("[data-goto]").forEach(function (b) { b.addEventListener("click", function () { showTab(b.dataset.goto); }); });
+
+  /* ---------- 미터기 (절감액) ---------- */
+  var shown = 0, raf = 0;
+  function calc(kwh) {
+    var cut = kwh * (LIST_P - MASTER_P), months = [], total = 0;
+    for (var i = 0; i < 3; i++) { var pb = FEE * PAYBACK[i], save = cut - FEE + pb; total += save; months.push([cut, pb, save]); }
+    return { cut: cut, months: months, total: total, after: cut - FEE };
+  }
+  function tick(target) {
+    cancelAnimationFrame(raf);
+    if (REDUCED) { shown = target; $("mTotal").textContent = num(target); return; }
+    var from = shown, t0 = performance.now();
+    (function step(t) {
+      var p = Math.min(1, (t - t0) / 260); shown = from + (target - from) * (1 - Math.pow(1 - p, 3));
+      $("mTotal").textContent = num(shown);
+      if (p < 1) raf = requestAnimationFrame(step);
+    })(t0);
+  }
+  function renderMeter() {
+    var kwh = +$("kwh").value, r = calc(kwh);
+    $("mKwh").textContent = num(kwh) + "kWh";
+    $("mAfter").textContent = won(r.after);
+    $("kwh").setAttribute("aria-valuetext", num(kwh) + "kWh, 3개월 절감 " + won(r.total));
+    tick(r.total);
+    var rows = "<tr><th>월</th><th>요금 절감</th><th>구독료</th><th>아낀 돈</th><th>페이백</th></tr>";
+    r.months.forEach(function (m, i) { rows += "<tr><td>" + (i + 1) + "개월째</td><td>" + won(m[0]) + "</td><td>−" + won(FEE) + "</td><td>" + won(m[2]) + "</td><td>+" + won(m[1]) + "</td></tr>"; });
+    rows += "<tr><td>합계</td><td></td><td></td><td>" + won(r.total) + "</td><td>+" + won(FEE * 2) + "</td></tr>";
+    $("sim").innerHTML = rows;
+  }
+  $("kwh").addEventListener("input", renderMeter);
+  $("avg900").addEventListener("click", function () { $("kwh").value = 900; renderMeter(); });
+  shown = calc(900).total; renderMeter();
+
+  /* ---------- 가입 ---------- */
+  $("copyCode").addEventListener("click", function () {
+    var t = $("codeText").textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { $("copyCode").textContent = "복사했습니다"; }, function () {});
+  });
+
+  /* ---------- 지도 (카카오맵) ---------- */
+  var places = null, routeLine = null, stopOvs = [], markers = {}, routeGeom = null, selId = null;
+  var stops = [null, null], pickIdx = -1, km = 2, fFast = true, f24 = false, fPriv = false;
+
+  function LL(lat, lng) { return new kakao.maps.LatLng(lat, lng); }
+  function cls(s) { return s.fast === 0 ? "slow" : s.kw >= 200 ? "k200" : s.kw >= 100 ? "k100" : "k50"; }
+  function speedLabel(s) { return s.fast === 0 ? "완속" : s.kw >= 200 ? "초급속" : "급속"; }
+  function navUrl(s) { return "https://map.kakao.com/link/to/" + encodeURIComponent(s.nm) + "," + s.lat + "," + s.lng; }
+  function speedBox(s) { return "<div class='speed " + cls(s) + "'><b>" + s.kw + "</b><span>kW " + speedLabel(s) + "</span></div>"; }
+  function tags(s) {
+    var b = "";
+    if (s.hot) b += "<span class='tag hot'>택시 기사 많이 이용</span>";
+    if (s.h24) b += "<span class='tag h24'>24시간</span>";
+    if (s.freePk) b += "<span class='tag'>무료주차</span>";
+    if (s.access === "private") b += "<span class='tag lock'>전용, 이용 제한</span>";
+    if (s.access === "check") b += "<span class='tag chk'>외부 이용 확인 필요</span>";
+    return b;
+  }
+  function plugs(s) {
+    var h = "";
+    for (var i = 0; i < Math.min(s.fast, 20); i++) h += "<i></i>";
+    for (var j = 0; j < Math.min(s.slow, 12); j++) h += "<i class='s'></i>";
+    return h;
+  }
+  function facesText(s) {
+    if (s.fast && s.slow) return "급속 " + s.fast + "면, 완속 " + s.slow + "면";
+    return s.fast ? "급속 " + s.fast + "면" : "완속 " + s.slow + "면";
+  }
+  function distText(n) { return n.d < 1000 ? Math.round(n.d / 10) * 10 + "m" : (n.d / 1000).toFixed(1) + "km"; }
+
+  function select(s, fromList) {
+    if (selId && markers[selId]) { markers[selId].el.classList.remove("sel"); markers[selId].ov.setZIndex(3); }
+    selId = s.id;
+    markers[s.id].el.classList.add("sel"); markers[s.id].ov.setZIndex(10);
+    var sh = $("sheet");
+    sh.innerHTML = "<div class='head'>" + speedBox(s) + "<div><div class='nm'>" + esc(s.nm) + "</div><div class='tags'>" + tags(s) + "</div></div>" +
+      "<button class='close' aria-label='닫기'>✕</button></div>" +
+      "<div class='facts'><div><span>충전면</span><b>" + facesText(s) + "</b><div class='plugs' aria-hidden='true'>" + plugs(s) + "</div></div>" +
+      "<div><span>운영시간</span><b>" + (s.h24 ? "24시간" : esc(s.hours)) + "</b>" + (s._near ? "<span style='margin-top:4px'>길에서 " + distText(s._near) + "</span>" : "") + "</div></div>" +
+      "<p class='addr'>" + esc(s.addr) + "</p><a class='navbtn' href='" + navUrl(s) + "' target='_blank' rel='noopener'>카카오맵으로 길안내</a>";
+    sh.hidden = false;
+    sh.querySelector(".close").addEventListener("click", closeSheet);
+    if (map.getLevel() > 7) map.setLevel(7);
+    map.setCenter(LL(s.lat, s.lng)); map.panBy(0, 90);
+    if (fromList) $("map").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" });
+  }
+  function closeSheet() {
+    $("sheet").hidden = true;
+    if (selId && markers[selId]) { markers[selId].el.classList.remove("sel"); markers[selId].ov.setZIndex(3); }
+    selId = null;
+  }
+
+  /* 동선 입력: 카카오 장소 검색(제주 범위) + 내 위치 + 지도에서 찍기 */
+  function renderStops() {
+    var h = "";
+    stops.forEach(function (s, i) {
+      var last = i === stops.length - 1, lab = i === 0 ? "출" : last ? "도" : String(i);
+      var ph = i === 0 ? "출발지 (예: 제주공항)" : last ? "도착지 (예: 성산일출봉)" : "경유지";
+      h += "<div class='stop'><span class='pin' aria-hidden='true'>" + lab + "</span><div class='sbox'><input data-i='" + i + "' placeholder='" + ph + "' value='" + esc(s ? s.name : "") + "' autocomplete='off' aria-label='" + ph + " 검색'><div class='sug' data-sug='" + i + "'></div></div>" +
+        "<button class='mini' data-me='" + i + "'>내 위치</button><button class='mini' data-pick='" + i + "'>지도</button>" +
+        (i > 0 && !last ? "<button class='mini' data-del='" + i + "' aria-label='경유지 빼기'>빼기</button>" : "<span></span>") + "</div>";
+    });
+    $("stops").innerHTML = h;
+    $("stops").querySelectorAll("input").forEach(function (el) {
+      var t = null;
+      el.addEventListener("input", function () {
+        var i = +el.dataset.i; stops[i] = null; clearTimeout(t);
+        t = setTimeout(function () { search(i, el.value.trim()); }, 300);
+      });
+    });
+    $("stops").querySelectorAll("[data-me]").forEach(function (b) { b.addEventListener("click", function () { locateMe(+b.dataset.me); }); });
+    $("stops").querySelectorAll("[data-pick]").forEach(function (b) {
+      b.addEventListener("click", function () { pickIdx = +b.dataset.pick; $("hint").textContent = "지도에서 넣을 위치를 한 번 누르세요."; $("map").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" }); });
+    });
+    $("stops").querySelectorAll("[data-del]").forEach(function (b) { b.addEventListener("click", function () { stops.splice(+b.dataset.del, 1); renderStops(); }); });
+  }
+  function search(i, q) {
+    var box = document.querySelector("[data-sug='" + i + "']");
+    if (!q) { box.innerHTML = ""; return; }
+    places.keywordSearch(q, function (data, status) {
+      var list = status === kakao.maps.services.Status.OK ? data.filter(function (d) { return /^제주/.test(d.address_name); }).slice(0, 6) : [];
+      if (!list.length) { box.innerHTML = "<div class='none'>제주에서 ‘" + esc(q) + "’을 찾지 못했습니다. 동네 이름이나 건물 이름으로 다시 검색해 보세요.</div>"; return; }
+      box.innerHTML = list.map(function (d, k) { return "<button data-k='" + k + "'><b>" + esc(d.place_name) + "</b><span>" + esc(d.road_address_name || d.address_name) + "</span></button>"; }).join("");
+      box.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var d = list[+b.dataset.k];
+          stops[i] = { name: d.place_name, lat: +d.y, lng: +d.x };
+          document.querySelector("#stops input[data-i='" + i + "']").value = d.place_name;
+          box.innerHTML = "";
+        });
+      });
+    }, { rect: JEJU_RECT, size: 10 });
+  }
+  function locateMe(i) {
+    if (!navigator.geolocation) { $("hint").textContent = "이 휴대폰에서는 현재 위치를 쓸 수 없습니다. 장소를 검색해 주세요."; return; }
+    $("hint").textContent = "현재 위치를 찾고 있습니다.";
+    navigator.geolocation.getCurrentPosition(function (p) {
+      stops[i] = { name: "내 위치", lat: p.coords.latitude, lng: p.coords.longitude };
+      renderStops(); $("hint").textContent = "현재 위치를 넣었습니다.";
+    }, function () { $("hint").textContent = "위치 권한이 꺼져 있습니다. 브라우저 설정에서 위치를 허용하거나 장소를 검색해 주세요."; }, { timeout: 8000 });
+  }
+
+  // 경로 주변 거리 (평면 근사, m)
+  function proj(lat, lng) { return [lng * 111320 * Math.cos(33.4 * Math.PI / 180), lat * 110540]; }
+  function nearest(pt, line) {
+    var p = proj(pt[0], pt[1]), best = Infinity, acc = 0, bestAlong = 0;
+    for (var i = 0; i < line.length - 1; i++) {
+      var a = proj(line[i][0], line[i][1]), b = proj(line[i + 1][0], line[i + 1][1]);
+      var dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx * dx + dy * dy, L = Math.sqrt(L2);
+      var t = L2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2)) : 0;
+      var x = a[0] + t * dx - p[0], y = a[1] + t * dy - p[1], d = Math.sqrt(x * x + y * y);
+      if (d < best) { best = d; bestAlong = acc + t * L; }
+      acc += L;
+    }
+    return { d: best, along: bestAlong };
+  }
+
+  function visible(s) {
+    if (fFast && s.fast === 0) return false;
+    if (f24 && !s.h24) return false;
+    if (!fPriv && s.access === "private") return false;
+    return true;
+  }
+  function refresh() {
+    var shownList = STATIONS.filter(visible), onRoute = [];
+    STATIONS.forEach(function (s) { s._near = null; });
+    shownList.forEach(function (s) {
+      if (routeGeom) { var n = nearest([s.lat, s.lng], routeGeom); if (n.d <= km * 1000) { s._near = n; onRoute.push(s); } }
+    });
+    STATIONS.forEach(function (s) {
+      var m = markers[s.id];
+      m.ov.setMap(visible(s) ? map : null);
+      m.el.classList.toggle("dim", !!routeGeom && !s._near);
+    });
+    if (selId && !visible(STATIONS.filter(function (x) { return x.id === selId; })[0])) closeSheet();
+    var items;
+    if (routeGeom) {
+      items = onRoute.sort(function (a, b) { return a._near.along - b._near.along; });
+      $("count").textContent = "길에서 " + km + "km 안에 충전소 " + items.length + "곳, 출발지에서 가까운 순서";
+    } else {
+      items = shownList.slice().sort(function (a, b) { return (b.hot - a.hot) || (b.kw - a.kw) || (b.fast - a.fast); });
+      $("count").textContent = "제주 SK일렉링크 충전소 " + items.length + "곳";
+    }
+    var h = "";
+    items.forEach(function (s) {
+      h += "<button class='row' data-id='" + esc(s.id) + "'>" + speedBox(s) + "<div><div class='nm'>" + esc(s.nm) + "</div>" +
+        "<div class='meta'><b>" + facesText(s) + "</b>, " + (s.h24 ? "24시간" : esc(s.hours)) + (s._near ? ", 길에서 " + distText(s._near) : "") + "</div>" +
+        "<div class='tags'>" + tags(s) + "</div></div></button>";
+    });
+    if (!items.length) h = "<div class='empty'>" + (routeGeom ? "이 길 " + km + "km 안에는 조건에 맞는 충전소가 없습니다. 거리를 넓히거나 ‘급속만’을 꺼 보세요." : "조건에 맞는 충전소가 없습니다. 위의 조건을 꺼 보세요.") + "</div>";
+    $("list").innerHTML = h;
+    $("list").querySelectorAll(".row").forEach(function (el) {
+      el.addEventListener("click", function () { select(STATIONS.filter(function (x) { return x.id === el.dataset.id; })[0], true); });
+    });
+  }
+
+  function clampCenter() {
+    var c = map.getCenter(), lat = Math.min(JEJU.n, Math.max(JEJU.s, c.getLat())), lng = Math.min(JEJU.e, Math.max(JEJU.w, c.getLng()));
+    if (lat !== c.getLat() || lng !== c.getLng()) map.panTo(LL(lat, lng));
+  }
+  function fitTo(pts) {
+    var b = new kakao.maps.LatLngBounds();
+    pts.forEach(function (p) { b.extend(LL(p[0], p[1])); });
+    map.setBounds(b, 40, 24, 40, 24);
+    if (map.getLevel() > MAX_LEVEL) map.setLevel(MAX_LEVEL);
+  }
+  function resetView() { map.setLevel(MAX_LEVEL); map.setCenter(LL(33.37, 126.55)); }
+  function drawStops(pts) {
+    stopOvs.forEach(function (o) { o.setMap(null); });
+    stopOvs = pts.map(function (p, i) {
+      var el = document.createElement("div");
+      el.className = "stopmk";
+      el.textContent = (i === 0 ? "출발 " : i === pts.length - 1 ? "도착 " : "경유 ") + p.name;
+      return new kakao.maps.CustomOverlay({ map: map, position: LL(p.lat, p.lng), content: el, yAnchor: 1.5, zIndex: 8 });
+    });
+  }
+  function setRoute(line, note) {
+    routeGeom = line;
+    if (routeLine) routeLine.setMap(null);
+    routeLine = new kakao.maps.Polyline({ map: map, path: line.map(function (p) { return LL(p[0], p[1]); }), strokeWeight: 6, strokeColor: "#0a6c87", strokeOpacity: 0.85 });
+    closeSheet(); fitTo(line);
+    $("hint").textContent = note;
+    refresh();
+  }
+  function runRoute() {
+    var pts = stops.filter(Boolean);
+    if (pts.length < 2 || pts.length !== stops.length) { $("hint").textContent = "출발지와 도착지를 검색한 뒤, 아래 목록에서 장소를 눌러 골라 주세요."; return; }
+    drawStops(pts);
+    var straight = pts.map(function (p) { return [p.lat, p.lng]; });
+    $("hint").textContent = "도로 경로를 찾고 있습니다.";
+    var url = "https://router.project-osrm.org/route/v1/driving/" + pts.map(function (p) { return p.lng.toFixed(5) + "," + p.lat.toFixed(5); }).join(";") + "?overview=full&geometries=geojson";
+    var done = false, timer = setTimeout(function () { if (!done) { done = true; setRoute(straight, "도로 경로를 받지 못해 직선으로 이었습니다. 충전소는 이 직선 기준으로 보여드립니다."); } }, 7000);
+    fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+      if (done) return; done = true; clearTimeout(timer);
+      var r = j.routes && j.routes[0];
+      if (!r) throw new Error("no route");
+      setRoute(r.geometry.coordinates.map(function (c) { return [c[1], c[0]]; }), "도로로 약 " + (r.distance / 1000).toFixed(1) + "km 길입니다.");
+    }).catch(function () { if (!done) { done = true; clearTimeout(timer); setRoute(straight, "도로 경로를 받지 못해 직선으로 이었습니다. 충전소는 이 직선 기준으로 보여드립니다."); } });
+  }
+  function clearRoute() {
+    stops = [null, null]; routeGeom = null;
+    if (routeLine) routeLine.setMap(null);
+    stopOvs.forEach(function (o) { o.setMap(null); });
+    routeLine = null; stopOvs = []; closeSheet();
+    renderStops(); $("hint").textContent = "출발지와 도착지를 검색해서 고르면, 그 길 주변 충전소를 지나는 순서대로 보여드립니다.";
+    resetView(); refresh();
+  }
+  function renderSaved() {
+    var saved = store("jt_routes") || [], h = saved.length ? "<span class='cap'>저장한 길</span>" : "";
+    saved.forEach(function (r, i) { h += "<button class='chip saved' data-s='" + i + "'>" + esc(r.label) + "</button>"; });
+    $("savedRoutes").innerHTML = h;
+    $("savedRoutes").querySelectorAll("[data-s]").forEach(function (b) {
+      b.addEventListener("click", function () { stops = saved[+b.dataset.s].stops.slice(); renderStops(); runRoute(); });
+    });
+  }
+
+  function initMap() {
+    if (typeof kakao === "undefined" || !kakao.maps) {
+      $("mapmsg").textContent = "지도를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해 주세요. 계속 안 되면 카카오맵 키와 등록 도메인을 확인해야 합니다.";
+      return;
+    }
+    kakao.maps.load(function () {
+      map = new kakao.maps.Map($("map"), { center: LL(33.37, 126.55), level: MAX_LEVEL });
+      map.setMaxLevel(MAX_LEVEL);
+      map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+      places = new kakao.maps.services.Places();
+      STATIONS.forEach(function (s) {
+        var el = document.createElement("div");
+        el.className = "mk " + cls(s);
+        el.title = s.nm + ", " + (s.fast ? s.kw + "kW " : "완속 ") + facesText(s);
+        el.innerHTML = s.fast ? s.kw + "<i>" + s.fast + "</i>" : "";
+        el.addEventListener("click", function (e) { e.stopPropagation(); select(s, false); });
+        markers[s.id] = { el: el, ov: new kakao.maps.CustomOverlay({ position: LL(s.lat, s.lng), content: el, xAnchor: 0.5, yAnchor: 0.5, zIndex: 3, clickable: true }) };
+      });
+      function zoomClass() { $("map").classList.toggle("far", map.getLevel() >= MAX_LEVEL); }
+      kakao.maps.event.addListener(map, "zoom_changed", function () { zoomClass(); clampCenter(); });
+      kakao.maps.event.addListener(map, "dragend", clampCenter);
+      zoomClass();
+      setTimeout(function () { map.relayout(); resetView(); }, 50);
+      kakao.maps.event.addListener(map, "click", function (e) {
+        if (pickIdx < 0) return;
+        stops[pickIdx] = { name: "지도에서 고른 곳 " + (pickIdx + 1), lat: e.latLng.getLat(), lng: e.latLng.getLng() };
+        pickIdx = -1; renderStops(); $("hint").textContent = "고른 위치를 넣었습니다.";
+      });
+      renderStops(); renderSaved();
+      $("examples").innerHTML = "<span class='cap'>예시</span>" + EXAMPLES.map(function (e, i) { return "<button class='chip' data-e='" + i + "'>" + e[0] + "</button>"; }).join("");
+      $("examples").querySelectorAll("[data-e]").forEach(function (b) {
+        b.addEventListener("click", function () { stops = EXAMPLES[+b.dataset.e][1].map(function (k) { var p = PLACES[k]; return { name: p[0], lat: p[1], lng: p[2] }; }); renderStops(); runRoute(); });
+      });
+      $("addStop").addEventListener("click", function () { if (stops.length >= 5) return; stops.splice(stops.length - 1, 0, null); renderStops(); });
+      $("runRoute").addEventListener("click", runRoute);
+      $("clearRoute").addEventListener("click", clearRoute);
+      $("saveRoute").addEventListener("click", function () {
+        var pts = stops.filter(Boolean);
+        if (pts.length < 2 || pts.length !== stops.length) { $("hint").textContent = "저장하려면 출발지와 도착지를 먼저 골라 주세요."; return; }
+        var saved = store("jt_routes") || [];
+        saved.unshift({ label: pts[0].name + "에서 " + pts[pts.length - 1].name, stops: pts });
+        store("jt_routes", saved.slice(0, 5)); renderSaved(); $("hint").textContent = "길을 저장했습니다. 이 휴대폰에서 다시 누르면 바로 불러옵니다.";
+      });
+      document.querySelectorAll("[data-km]").forEach(function (b) {
+        b.addEventListener("click", function () { km = +b.dataset.km; document.querySelectorAll("[data-km]").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); refresh(); });
+      });
+      function toggle(id, fn) { $(id).addEventListener("click", function () { $(id).setAttribute("aria-pressed", fn() ? "true" : "false"); refresh(); }); }
+      toggle("fFast", function () { return (fFast = !fFast); });
+      toggle("f24", function () { return (f24 = !f24); });
+      toggle("fPriv", function () { return (fPriv = !fPriv); });
+      refresh();
+    });
+  }
+})();
+</script>
+</body>
+</html>
