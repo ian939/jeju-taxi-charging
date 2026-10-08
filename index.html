@@ -109,6 +109,10 @@ ul.terms li{margin:5px 0}
 .btn.quiet{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);margin-top:8px}
 
 /* 지도 탭 */
+.mapstat{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--red);color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:12px}
+.mapstat span{font-size:15px;font-weight:700;line-height:1.35}
+.mapstat b{flex:none;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.mapstat small{font-size:18px;margin-left:2px}
 .route .stop{display:grid;grid-template-columns:26px 1fr auto auto auto;gap:6px;align-items:center;margin-bottom:8px}
 .route .pin{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
 .route .sbox{position:relative;min-width:0}
@@ -259,9 +263,9 @@ nav.tabs button[aria-selected=true]::before{content:"";position:absolute;top:-1p
     <p class="free">충전량 한도 없이 마음껏 충전하세요</p>
     <dl class="facts">
       <div><dt>월 구독료</dt><dd>19,900원</dd></div>
-      <div><dt>쓸 수 있는 곳</dt><dd>SK일렉링크 급속 충전기<br>제주 160면</dd></div>
+      <div><dt>쓸 수 있는 곳</dt><dd>SK일렉링크 급속 충전기</dd></div>
     </dl>
-    <p class="note">회원가는 2026년 9월, 충전기 수는 2026년 10월 기준 제주 급속 전체 면수입니다. 일부 고속도로 휴게소, 위탁운영, 비공용 충전소는 빠집니다.</p>
+    <p class="note">회원가는 2026년 9월 기준입니다. 일부 고속도로 휴게소, 위탁운영, 비공용 충전소는 빠집니다.</p>
   </div>
 
   <div class="block promo-card">
@@ -323,6 +327,7 @@ nav.tabs button[aria-selected=true]::before{content:"";position:absolute;top:-1p
 
 <!-- 지도 -->
 <section class="tab" id="t-map" aria-label="충전소 지도">
+  <div class="mapstat"><span>제주에서 사용 가능한 SK일렉링크 급속 충전기</span><b>160<small>기</small></b></div>
   <div class="block route">
     <h2>자주 다니는 길을 넣어 보세요</h2>
     <div id="stops"></div>
